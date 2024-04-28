@@ -135,7 +135,7 @@ def read_in_algorithm_codes_and_tariffs(alg_codes_file):
 ############
 ############ END OF SECTOR 0 (IGNORE THIS COMMENT)
 
-input_file = "AISearchfile012.txt"
+input_file = "AISearchfile017.txt"
 
 ############ START OF SECTOR 1 (IGNORE THIS COMMENT)
 ############
@@ -507,7 +507,7 @@ def Genetic_Algorithm(pop_size, max_it, dist_matrix, ELITE_RATIO):
 
 
 ### HYPER-PARAMETERS ###
-TIME_LIMIT = 60 # (55 seconds) EDIT LATER
+TIME_LIMIT = 55 
 GENERATIONS = 3000
 pop_size = 1000
 max_it = 1000

@@ -438,7 +438,7 @@ def Genetic_Algorithm(pop_size, max_it, dist_matrix):
 
 
 ### HYPER-PARAMETERS ###
-TIME_LIMIT = 55 # (55 seconds) EDIT LATER
+TIME_LIMIT = 50 # (55 seconds) EDIT LATER
 PROB = 0.5
 GENERATIONS = 3000
 pop_size = 1000
