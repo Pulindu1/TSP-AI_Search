@@ -356,30 +356,25 @@ def Reproduce(X, Y):
     new_tour = X[:crossover_point] + [city for city in Y if city not in X[:crossover_point]]
     return new_tour
 
-def Ordered_Crossover(parent1, parent2):
-    length = len(parent1)
-    # Step 1: Randomly select a crossover segment
-    start, end = sorted(random.sample(range(length), 2))
+def Ordered_Crossover(X, Y):
+    length = len(X)
+    crossover_point, end = sorted(random.sample(range(length), 2))
 
-    # Step 2: Copy the segment from parent1 to offspring
-    offspring = [None] * length
-    offspring[start:end + 1] = parent1[start:end + 1]
-
-    # Step 3: Fill in the remaining positions with genes from parent2
-    # skipping genes already in the offspring
-    parent2_index = (end + 1) % length  # Start from the end of the copied segment
+    # Copy segment from X, then fill remaining positions with Y. Skip already used nodes.
+    Z = [None] * length
+    Z[crossover_point:end + 1] = X[crossover_point:end + 1]
+    Y_index = (end + 1) % length
     offspring_index = (end + 1) % length
 
-    # Continue until the offspring is filled
-    while None in offspring:
-        parent2_city = parent2[parent2_index]
-        if parent2_city not in offspring:
-            offspring[offspring_index] = parent2_city
+    # Ensure no "none" nodes
+    while None in Z:
+        Y_city = Y[Y_index]
+        if Y_city not in Z:
+            Z[offspring_index] = Y_city
             offspring_index = (offspring_index + 1) % length
-        parent2_index = (parent2_index + 1) % length
+        Y_index = (Y_index + 1) % length
 
-    # Return the new offspring
-    return offspring
+    return Z
 
 
 def Calculate_Tour_Length(tour, dist_matrix):
