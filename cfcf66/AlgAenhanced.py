@@ -135,7 +135,7 @@ def read_in_algorithm_codes_and_tariffs(alg_codes_file):
 ############
 ############ END OF SECTOR 0 (IGNORE THIS COMMENT)
 
-input_file = "AISearchfile017.txt"
+input_file = "AISearchfile042.txt"
 
 ############ START OF SECTOR 1 (IGNORE THIS COMMENT)
 ############
@@ -364,14 +364,14 @@ def Ordered_Crossover(X, Y):
     Z = [None] * length
     Z[crossover_point:end + 1] = X[crossover_point:end + 1]
     Y_index = (end + 1) % length
-    offspring_index = (end + 1) % length
+    Z_index = (end + 1) % length
 
     # Ensure no "none" nodes
     while None in Z:
         Y_city = Y[Y_index]
         if Y_city not in Z:
-            Z[offspring_index] = Y_city
-            offspring_index = (offspring_index + 1) % length
+            Z[Z_index] = Y_city
+            Z_index = (Z_index + 1) % length
         Y_index = (Y_index + 1) % length
 
     return Z
@@ -403,7 +403,7 @@ def Calculate_Fitness(tour, dist_matrix):
 
 def Roulette_Wheel_Selection(population, dist_matrix):
     fitness_scores = [Calculate_Fitness(individual, dist_matrix) for individual in population]  # calculate fitness for the pop
-    weighted_fitness_scores = [math.sqrt(f) for f in fitness_scores]  # f^3 to exaggerate differences
+    weighted_fitness_scores = [math.sqrt(f) for f in fitness_scores]  # sqrt(f) to exaggerate differences
     sum_weighted_fitness = sum(weighted_fitness_scores)  # sum weighted fitness scores
 
     pick = random.uniform(0, sum_weighted_fitness)  # set fitness threshold randomly
@@ -434,7 +434,7 @@ def Initialise_Population(num_cities, dist_matrix, pop_size):
         population.append(greedy_tour)
     return population
 
-def calculate_population_diversity(population, dist_matrix):
+def Calculate_Population_Diversity(population, dist_matrix):
     diversity = 0
     count = 0
     for i in range(len(population)):
@@ -443,7 +443,7 @@ def calculate_population_diversity(population, dist_matrix):
             count += 1
     return (diversity / count) if count > 0 else  0
 
-def adapt_mutation_rate(diversity, base_rate=0.05, max_mutation_rate=0.4):
+def Adapt_Mutation_Rate(diversity, base_rate=0.05, max_mutation_rate=0.4):
     return max_mutation_rate - (diversity / 1000) * (max_mutation_rate - base_rate) # normalise
 
 def Genetic_Algorithm(pop_size, max_it, dist_matrix, ELITE_RATIO):
@@ -459,8 +459,8 @@ def Genetic_Algorithm(pop_size, max_it, dist_matrix, ELITE_RATIO):
         newP = []
         elites = []
 
-        diversity = calculate_population_diversity(P, dist_matrix)
-        PROB = adapt_mutation_rate(diversity)
+        diversity = Calculate_Population_Diversity(P, dist_matrix)
+        PROB = Adapt_Mutation_Rate(diversity)
         
         # select elites from pop
         fitness_tour_pairs = [(Calculate_Tour_Length(individual, dist_matrix), individual) for individual in P]
@@ -507,7 +507,7 @@ def Genetic_Algorithm(pop_size, max_it, dist_matrix, ELITE_RATIO):
 
 
 ### HYPER-PARAMETERS ###
-TIME_LIMIT = 55 
+TIME_LIMIT = 55
 GENERATIONS = 3000
 pop_size = 1000
 max_it = 1000

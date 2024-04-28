@@ -381,7 +381,7 @@ def Calculate_Fitness(tour, dist_matrix):
 import math
 def Roulette_Wheel_Selection(population, dist_matrix):
     fitness_scores = [Calculate_Fitness(individual, dist_matrix) for individual in population]  # calculate fitness for the pop
-    weighted_fitness_scores = [math.sqrt(f) for f in fitness_scores]  # f^3 to exaggerate differences
+    weighted_fitness_scores = [math.sqrt(f) for f in fitness_scores]  # sqrt(f) to exaggerate differences
     sum_weighted_fitness = sum(weighted_fitness_scores)  # sum weighted fitness scores
 
     pick = random.uniform(0, sum_weighted_fitness)  # set fitness threshold randomly
@@ -439,7 +439,7 @@ def Genetic_Algorithm(pop_size, max_it, dist_matrix):
 
 ### HYPER-PARAMETERS ###
 TIME_LIMIT = 50 # (55 seconds) EDIT LATER
-PROB = 0.5
+PROB = 0.2
 GENERATIONS = 3000
 pop_size = 1000
 max_it = 1000
