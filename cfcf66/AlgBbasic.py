@@ -354,21 +354,41 @@ added_note = ""
 ############
 ############ END OF SECTOR 9 (IGNORE THIS COMMENT)
 
+import heapq as hp
+import random as rd
+import time
+import math
 
+def init_pheramone_lvl(num_cities, initial_pheromone):
+    # Initialize a square matrix with initial pheromone values
+    return [[initial_pheromone] * num_cities for _ in range(num_cities)]
 
-def init_pheramone_lvl():
-    pass
+def Calculate_Tour_Length(tour, dist_matrix):
+    total_distance = 0
+
+    for i in range(1, len(tour)):
+        total_distance += dist_matrix[tour[i - 1]][tour[i]]
+
+    # complete the loop
+    total_distance += dist_matrix[tour[-1]][tour[0]]
+    return total_distance
+
 def init_best():
     pass
 def place_ants():
     pass
+def build_solution():
+    pass
+def deposit_evap_pheromone():
+    pass
+
 
 
 def Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl):
     
-    init_pheramone_lvl()
+    pheromone_lvl = init_pheramone_lvl()
     
-    best = init_best()
+    best_solution = init_best()
     
     place_ants()
 
@@ -376,12 +396,21 @@ def Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl):
 
     while t < max_it:
         for i in range(num_ants):
-            pass
+
+            curr_solution = build_solution()
+
+            cost = Calculate_Tour_Length(tour, dist_matrix)
+            # NOTE evaluate the cost
+
+            if curr_solution > best_solution:
+                best_solution = curr_solution
+            
+            deposit_evap_pheromone()
+            t += 1
 
 
 
-
-    return best
+    return best_solution
 
 
 
@@ -391,11 +420,15 @@ max_it = 1000
 num_ants = 100
 pheramone_lvl = 0.1
 pheramone_decay_rate = None
-# calculate pheramone deposit amount
+# NOTE calculate pheramone deposit amount
 
 ### END OF HYPER-PARAMETERS ###
 
+
+# call function
 tour, tour_length = Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl)
+print("Best tour", tour)
+print("tour length", tour_length)
 
 
 
