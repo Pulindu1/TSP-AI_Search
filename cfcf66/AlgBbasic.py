@@ -293,7 +293,7 @@ my_last_name = "Fonseka"
 ############
 ############ END OF SECTOR 7 (IGNORE THIS COMMENT)
 
-algorithm_code = "PS"
+algorithm_code = "AC"
 
 ############ START OF SECTOR 8 (IGNORE THIS COMMENT)
 ############
@@ -354,3 +354,165 @@ added_note = ""
 ############
 ############ END OF SECTOR 9 (IGNORE THIS COMMENT)
 
+
+
+def init_pheramone_lvl():
+    pass
+def init_best():
+    pass
+def place_ants():
+    pass
+
+
+def Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl):
+    
+    init_pheramone_lvl()
+    
+    best = init_best()
+    
+    place_ants()
+
+    t = 0
+
+    while t < max_it:
+        for i in range(num_ants):
+            pass
+
+
+
+
+    return best
+
+
+
+
+### HYPER-PARAMETERS ###
+max_it = 1000
+num_ants = 100
+pheramone_lvl = 0.1
+pheramone_decay_rate = None
+# calculate pheramone deposit amount
+
+### END OF HYPER-PARAMETERS ###
+
+tour, tour_length = Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl)
+
+
+
+# remove warning
+pop_size = 1000
+num_parts = 1000
+
+
+############ START OF SECTOR 10 (IGNORE THIS COMMENT)
+############
+############ YOUR CODE SHOULD NOW BE COMPLETE AND WHEN EXECUTION OF THIS PROGRAM 'skeleton.py'
+############ REACHES THIS POINT, YOU SHOULD HAVE COMPUTED A TOUR IN THE RESERVED LIST VARIABLE 'tour', 
+############ WHICH HOLDS A LIST OF THE INTEGERS FROM {0, 1, ..., 'num_cities' - 1} SO THAT EVERY INTEGER
+############ APPEARS EXACTLY ONCE, AND YOU SHOULD ALSO HOLD THE LENGTH OF THIS TOUR IN THE RESERVED
+############ INTEGER VARIABLE 'tour_length'.
+############
+############ YOUR TOUR WILL BE PACKAGED IN A TOUR FILE OF THE APPROPRIATE FORMAT AND THIS TOUR FILE'S
+############ NAME WILL BE A MIX OF THE NAME OF THE CITY FILE, THE NAME OF THIS PROGRAM AND THE
+############ CURRENT DATE AND TIME. SO, EVERY SUCCESSFUL EXECUTION GIVES A TOUR FILE WITH A UNIQUE
+############ NAME AND YOU CAN RENAME THE ONES YOU WANT TO KEEP LATER.
+############
+############ DO NOT EDIT ANY TOUR FILE! ALL TOUR FILES MUST BE LEFT AS THEY WERE ON OUTPUT.
+############
+############ DO NOT TOUCH OR ALTER THE CODE BELOW THIS POINT! YOU HAVE BEEN WARNED!
+############
+
+end_time = time.time()
+elapsed_time = round(end_time - start_time, 1)
+
+if algorithm_code == "GA":
+    try: max_it
+    except NameError: max_it = None
+    try: pop_size
+    except NameError: pop_size = None
+    if added_note != "":
+        added_note = added_note + "\n"
+    added_note = added_note + "The parameter values are 'max_it' = " + str(max_it) + " and 'pop_size' = " + str(pop_size) + "."
+
+if algorithm_code == "AC":
+    try: max_it
+    except NameError: max_it = None
+    try: num_ants
+    except NameError: num_ants = None
+    if added_note != "":
+        added_note = added_note + "\n"
+    added_note = added_note + "The parameter values are 'max_it' = " + str(max_it) + " and 'num_ants' = " + str(num_ants) + "."
+
+if algorithm_code == "PS":
+    try: max_it
+    except NameError: max_it = None
+    try: num_parts
+    except NameError: num_parts = None
+    if added_note != "":
+        added_note = added_note + "\n"
+    added_note = added_note + "The parameter values are 'max_it' = " + str(max_it) + " and 'num_parts' = " + str(num_parts) + "."
+    
+added_note = added_note + "\nRUN-TIME = " + str(elapsed_time) + " seconds.\n"
+
+flag = "good"
+length = len(tour)
+for i in range(0, length):
+    if isinstance(tour[i], int) == False:
+        flag = "bad"
+    else:
+        tour[i] = int(tour[i])
+if flag == "bad":
+    print("*** error: Your tour contains non-integer values.")
+    sys.exit()
+if isinstance(tour_length, int) == False:
+    print("*** error: The tour-length is a non-integer value.")
+    sys.exit()
+tour_length = int(tour_length)
+if len(tour) != num_cities:
+    print("*** error: The tour does not consist of " + str(num_cities) + " cities as there are, in fact, " + str(len(tour)) + ".")
+    sys.exit()
+flag = "good"
+for i in range(0, num_cities):
+    if not i in tour:
+        flag = "bad"
+if flag == "bad":
+    print("*** error: Your tour has illegal or repeated city names.")
+    sys.exit()
+check_tour_length = 0
+for i in range(0, num_cities - 1):
+    check_tour_length = check_tour_length + dist_matrix[tour[i]][tour[i + 1]]
+check_tour_length = check_tour_length + dist_matrix[tour[num_cities - 1]][tour[0]]
+if tour_length != check_tour_length:
+    flag = print("*** error: The length of your tour is not " + str(tour_length) + "; it is actually " + str(check_tour_length) + ".")
+    sys.exit()
+print("You, user " + my_user_name + ", have successfully built a tour of length " + str(tour_length) + "!")
+len_user_name = len(my_user_name)
+user_number = 0
+for i in range(0, len_user_name):
+    user_number = user_number + ord(my_user_name[i])
+alg_number = ord(algorithm_code[0]) + ord(algorithm_code[1])
+tour_diff = abs(tour[0] - tour[num_cities - 1])
+for i in range(0, num_cities - 1):
+    tour_diff = tour_diff + abs(tour[i + 1] - tour[i])
+certificate = user_number + alg_number + tour_diff
+local_time = time.asctime(time.localtime(time.time()))
+output_file_time = local_time[4:7] + local_time[8:10] + local_time[11:13] + local_time[14:16] + local_time[17:19]
+output_file_time = output_file_time.replace(" ", "0")
+script_name = os.path.basename(sys.argv[0])
+if len(sys.argv) > 2:
+    output_file_time = sys.argv[2]
+output_file_name = script_name[0:len(script_name) - 3] + "_" + input_file[0:len(input_file) - 4] + "_" + output_file_time + ".txt"
+
+f = open(output_file_name,'w')
+f.write("USER = {0} ({1} {2}),\n".format(my_user_name, my_first_name, my_last_name))
+f.write("ALGORITHM CODE = {0}, NAME OF CITY-FILE = {1},\n".format(algorithm_code, input_file))
+f.write("SIZE = {0}, TOUR LENGTH = {1},\n".format(num_cities, tour_length))
+f.write(str(tour[0]))
+for i in range(1,num_cities):
+    f.write(",{0}".format(tour[i]))
+f.write(",\nNOTE = {0}".format(added_note))
+f.write("CERTIFICATE = {0}.\n".format(certificate))
+f.close()
+print("I have successfully written your tour to the tour file:\n   " + output_file_name + ".")
+
+############ END OF SECTOR 10 (IGNORE THIS COMMENT)
