@@ -472,7 +472,7 @@ def Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha,
 
     while t < max_it:
         ants_starting_positions = place_ants(num_ants, num_cities)
-        all_ants_solutions = []\
+        all_ants_solutions = []
         
         for i in range(num_ants):
             start_city = ants_starting_positions[i]  # Get the starting city for each ant
