@@ -157,7 +157,7 @@ def read_in_algorithm_codes_and_tariffs(alg_codes_file):
 ############
 ############ END OF SECTOR 0 (IGNORE THIS COMMENT)
 
-input_file = "AISearchfile012.txt"
+input_file = "AISearchfile535.txt"
 
 ############ START OF SECTOR 1 (IGNORE THIS COMMENT)
 ############
@@ -360,8 +360,8 @@ import time
 import math
 
 def init_pheramone_lvl(num_cities, initial_pheromone):
-    # Initialize a square matrix with initial pheromone values
-    return [[initial_pheromone] * num_cities for _ in range(num_cities)]
+    # Initialize matrix with initial pheromone values
+    return [[initial_pheromone] * num_cities for i in range(num_cities)]
 
 def Calculate_Tour_Length(tour, dist_matrix):
     total_distance = 0
@@ -516,7 +516,7 @@ def Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha,
             all_ants_solutions.append((curr_solution, curr_solution_length))
 
             # cost = Calculate_Tour_Length(tour, dist_matrix)
-            # NOTE evaluate the cost
+            ## evaluate the cost
 
             if curr_solution < best_solution:
                 best_solution = curr_solution
@@ -544,20 +544,20 @@ def Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha,
 ### HYPER-PARAMETERS ###
 TIME_LIMIT = 55
 max_it = 1000
-num_ants = 100
-pheramone_lvl = 0.1
+num_ants = 20
+pheramone_lvl = 0.5
 pheramone_decay_rate = None
 alpha = 1
-beta = 2
+beta = 3
 rho = 0.1 # evap rate
-Q = 100
+total_pheromone = 100
 # NOTE calculate pheramone deposit amount
 
 ### END OF HYPER-PARAMETERS ###
 
 
 # call function
-tour, tour_length = Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha, beta, rho, Q)
+tour, tour_length = Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha, beta, rho, total_pheromone)
 print("Best tour", tour)
 print("tour length", tour_length)
 
