@@ -157,7 +157,7 @@ def read_in_algorithm_codes_and_tariffs(alg_codes_file):
 ############
 ############ END OF SECTOR 0 (IGNORE THIS COMMENT)
 
-input_file = "AISearchfile535.txt"
+input_file = "AISearchfile180.txt"
 
 ############ START OF SECTOR 1 (IGNORE THIS COMMENT)
 ############
@@ -394,28 +394,28 @@ def place_ants(num_ants, num_cities):
 # calc probability for moving to each city
 def calculate_transition_probabilities(curr_city, unvisited_cities, pheromone_matrix, dist_matrix, alpha, beta):
     total = 0
-    transition_probabilities = []
+    probabilities = []
     
+    # Calculate attractiveness for each unvisited city
     for city in unvisited_cities:
-        if dist_matrix[curr_city][city] == 0:
-            transition_probabilities.append(0.00001)# NOTE could be either 'None' or a small number
-            continue
-        pheromone = pheromone_matrix[curr_city][city] ** alpha
-        heuristic = (1 / dist_matrix[curr_city][city]) ** beta
-        total += pheromone * heuristic
-    
-    # calc probabilities
-    for city in unvisited_cities:
-        if dist_matrix[curr_city][city] == 0:
-            transition_probabilities.append(0)  # no self looping
-            continue
+        if dist_matrix[curr_city][city] == 0:  # Avoid division by zero or unwanted transitions
+            probabilities.append(0)  # Directly append zero, no transition possible
+        else:
+            pheromone = pheromone_matrix[curr_city][city] ** alpha
+            heuristic = (1 / dist_matrix[curr_city][city]) ** beta
+            attraction = pheromone * heuristic
+            probabilities.append(attraction)
+            total += attraction
 
-        pheromone = (pheromone_matrix[curr_city][city]) ** alpha
-        heuristic = (1 / dist_matrix[curr_city][city]) ** beta
-        probability = (pheromone * heuristic) / total
-        transition_probabilities.append(probability)
-    
-    return transition_probabilities
+    # Normalize to create probabilities if total attraction is greater than zero
+    if total > 0:
+        probabilities = [p / total for p in probabilities]
+    else:
+        # If total is zero, distribute probabilities equally among unvisited cities
+        probabilities = [1 / len(unvisited_cities) for _ in unvisited_cities]
+
+    return probabilities
+
 
 # creates a solution for ant, involving chance/probability
 def build_solution(start_city, num_cities, pheromone_matrix, dist_matrix, alpha, beta):
