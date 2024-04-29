@@ -338,7 +338,7 @@ import time
 import math
 
 # generate random population
-def Random_Population(num_cities, pop_size):
+def random_population(num_cities, pop_size):
     population = []
     for i in range(pop_size):
         tour = list(range(num_cities))
@@ -346,17 +346,17 @@ def Random_Population(num_cities, pop_size):
         population.append(tour)
     return population
 
-def Choose_From_P(P):
+def choose_from_P(P):
     return random.choice(P)
 
-def Reproduce(X, Y):
+def reproduce(X, Y):
     # Implement crossover such as Ordered Crossover (OX) or Partially Mapped Crossover (PMX)
     # Placeholder implementation:
     crossover_point = random.randint(1, len(X) - 2)
     new_tour = X[:crossover_point] + [city for city in Y if city not in X[:crossover_point]]
     return new_tour
 
-def Ordered_Crossover(X, Y):
+def ordered_crossover(X, Y):
     length = len(X)
     crossover_point, end = sorted(random.sample(range(length), 2))
 
@@ -377,7 +377,7 @@ def Ordered_Crossover(X, Y):
     return Z
 
 
-def Calculate_Tour_Length(tour, dist_matrix):
+def calculate_tour_length(tour, dist_matrix):
     total_distance = 0
 
     for i in range(1, len(tour)):
@@ -388,21 +388,21 @@ def Calculate_Tour_Length(tour, dist_matrix):
     return total_distance
 
 
-def Mutate(tour, dist_matrix):
+def mutate(tour, dist_matrix):
     a, b = random.sample(range(len(tour)), 2)
     new_tour = tour[:]
     new_tour[a], new_tour[b] = new_tour[b], new_tour[a]
     return new_tour
     
-def Calculate_Fitness(tour, dist_matrix):
-    tour_length = Calculate_Tour_Length(tour, dist_matrix)
+def calculate_fitness(tour, dist_matrix):
+    tour_length = calculate_tour_length(tour, dist_matrix)
     if tour_length > 0:
         return 1.0 / tour_length
     return float('inf')  # avoid division by zero
 
 
-def Roulette_Wheel_Selection(population, dist_matrix):
-    fitness_scores = [Calculate_Fitness(individual, dist_matrix) for individual in population]  # calculate fitness for the pop
+def roulette_wheel_selection(population, dist_matrix):
+    fitness_scores = [calculate_fitness(individual, dist_matrix) for individual in population]  # calculate fitness for the pop
     weighted_fitness_scores = [math.sqrt(f) for f in fitness_scores]  # sqrt(f) to exaggerate differences
     sum_weighted_fitness = sum(weighted_fitness_scores)  # sum weighted fitness scores
 
@@ -416,7 +416,7 @@ def Roulette_Wheel_Selection(population, dist_matrix):
             return individual
 
 # functions for greedy NN initialisation
-def Greedy_Nearest_Neighbors(num_cities, dist_matrix):
+def greedy_nearest_neighbors(num_cities, dist_matrix):
     start_city = random.randint(0, num_cities - 1)
     tour = [start_city] #start tour
     unvisited_cities = set(range(num_cities)) - {start_city}
@@ -427,29 +427,29 @@ def Greedy_Nearest_Neighbors(num_cities, dist_matrix):
         tour.append(next_city)
         unvisited_cities.remove(next_city)
     return tour
-def Initialise_Population(num_cities, dist_matrix, pop_size):
+def initialise_population(num_cities, dist_matrix, pop_size):
     population = []
     for _i in range(pop_size):
-        greedy_tour = Greedy_Nearest_Neighbors(num_cities, dist_matrix)
+        greedy_tour = greedy_nearest_neighbors(num_cities, dist_matrix)
         population.append(greedy_tour)
     return population
 
-def Calculate_Population_Diversity(population, dist_matrix):
+def calculate_population_diversity(population, dist_matrix):
     diversity = 0
     count = 0
     for i in range(len(population)):
         for j in range(i + 1, len(population)):
-            diversity += abs(Calculate_Tour_Length(population[i], dist_matrix) - Calculate_Tour_Length(population[j], dist_matrix))
+            diversity += abs(calculate_tour_length(population[i], dist_matrix) - calculate_tour_length(population[j], dist_matrix))
             count += 1
     return (diversity / count) if count > 0 else  0
 
-def Adapt_Mutation_Rate(diversity, base_rate=0.05, max_mutation_rate=0.4):
+def adapt_mutation_rate(diversity, base_rate=0.05, max_mutation_rate=0.4):
     return max_mutation_rate - (diversity / 1000) * (max_mutation_rate - base_rate) # normalise
 
-def Genetic_Algorithm(pop_size, max_it, dist_matrix, ELITE_RATIO):
+def genetic_algorithm(pop_size, max_it, dist_matrix, ELITE_RATIO):
     ## randomly generated initial population
     # P = Random_Population(num_cities, pop_size)
-    P = Initialise_Population(num_cities, dist_matrix, pop_size)
+    P = initialise_population(num_cities, dist_matrix, pop_size)
     # pop_size == len(P) == |P|
     tour = None
     tour_length = float('inf')  # initialise with infinity
@@ -459,11 +459,11 @@ def Genetic_Algorithm(pop_size, max_it, dist_matrix, ELITE_RATIO):
         newP = []
         elites = []
 
-        diversity = Calculate_Population_Diversity(P, dist_matrix)
-        PROB = Adapt_Mutation_Rate(diversity)
+        diversity = calculate_population_diversity(P, dist_matrix)
+        PROB = adapt_mutation_rate(diversity)
         
         # select elites from pop
-        fitness_tour_pairs = [(Calculate_Tour_Length(individual, dist_matrix), individual) for individual in P]
+        fitness_tour_pairs = [(calculate_tour_length(individual, dist_matrix), individual) for individual in P]
         fitness_tour_pairs.sort()  # Sort by tour length, ascending
         for i in range(int(ELITE_RATIO * pop_size)):
             elites.append(fitness_tour_pairs[i][1])
@@ -472,19 +472,19 @@ def Genetic_Algorithm(pop_size, max_it, dist_matrix, ELITE_RATIO):
         # each generation
         for i in range(pop_size):
             # generate parents, dependant on fitness
-            X = Roulette_Wheel_Selection(P, dist_matrix)
-            Y = Roulette_Wheel_Selection(P, dist_matrix)
+            X = roulette_wheel_selection(P, dist_matrix)
+            Y = roulette_wheel_selection(P, dist_matrix)
 
             # generate child
             # Z = Reproduce(X, Y)
-            Z = Ordered_Crossover(X, Y)
+            Z = ordered_crossover(X, Y)
 
             # has a 'PROB' chance to mutate Z!
             if random.random() < PROB:
-                Z = Mutate(Z, dist_matrix)
+                Z = mutate(Z, dist_matrix)
             
             # Calculate the tour length of the new tour
-            curr_tour_length = Calculate_Tour_Length(Z, dist_matrix)
+            curr_tour_length = calculate_tour_length(Z, dist_matrix)
             if curr_tour_length < tour_length:
                 tour = Z
                 tour_length = curr_tour_length
@@ -515,7 +515,7 @@ ELITE_RATIO = 0.05
 ### END OF HYPER-PARAMETERS ###
 
 # call function
-tour, tour_length = Genetic_Algorithm(pop_size, max_it, dist_matrix, ELITE_RATIO)
+tour, tour_length = genetic_algorithm(pop_size, max_it, dist_matrix, ELITE_RATIO)
 print("Best tour:", tour)
 print("Tour length:", tour_length)
 

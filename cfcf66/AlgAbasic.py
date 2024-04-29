@@ -335,9 +335,10 @@ added_note = ""
 import heapq as hp
 import random as rd
 import time
+import math
 
 # generate random population
-def Random_Population(num_cities, pop_size):
+def random_population(num_cities, pop_size):
     population = []
     for i in range(pop_size):
         tour = list(range(num_cities))
@@ -345,17 +346,17 @@ def Random_Population(num_cities, pop_size):
         population.append(tour)
     return population
 
-def Choose_From_P(P):
+def choose_from_P(P):
     return random.choice(P)
 
-def Reproduce(X, Y):
+def reproduce(X, Y):
     # NOTE: very basic, not ideal. Maybe change later
     crossover_point = random.randint(1, len(X) - 2)
     new_tour = X[:crossover_point] + [city for city in Y if city not in X[:crossover_point]]
     return new_tour
 
 
-def Calculate_Tour_Length(tour, dist_matrix):
+def calculate_tour_length(tour, dist_matrix):
     total_distance = 0
 
     for i in range(1, len(tour)):
@@ -366,21 +367,20 @@ def Calculate_Tour_Length(tour, dist_matrix):
     return total_distance
 
 
-def Mutate(tour, dist_matrix):
+def mutate(tour, dist_matrix):
     a, b = random.sample(range(len(tour)), 2)
     new_tour = tour[:]
     new_tour[a], new_tour[b] = new_tour[b], new_tour[a]
     return new_tour
     
-def Calculate_Fitness(tour, dist_matrix):
-    tour_length = Calculate_Tour_Length(tour, dist_matrix)
+def calculate_fitness(tour, dist_matrix):
+    tour_length = calculate_tour_length(tour, dist_matrix)
     if tour_length > 0:
         return 1.0 / tour_length
     return float('inf')  # avoid division by zero
 
-import math
-def Roulette_Wheel_Selection(population, dist_matrix):
-    fitness_scores = [Calculate_Fitness(individual, dist_matrix) for individual in population]  # calculate fitness for the pop
+def roulette_wheel_selection(population, dist_matrix):
+    fitness_scores = [calculate_fitness(individual, dist_matrix) for individual in population]  # calculate fitness for the pop
     weighted_fitness_scores = [math.sqrt(f) for f in fitness_scores]  # sqrt(f) to exaggerate differences
     sum_weighted_fitness = sum(weighted_fitness_scores)  # sum weighted fitness scores
 
@@ -395,9 +395,9 @@ def Roulette_Wheel_Selection(population, dist_matrix):
 
 
 
-def Genetic_Algorithm(pop_size, max_it, dist_matrix):
+def genetic_algorithm(pop_size, max_it, dist_matrix):
     # randomly generated initial population
-    P = Random_Population(num_cities, pop_size)
+    P = random_population(num_cities, pop_size)
     # pop_size = len(P) # = |P|
     tour = None
     tour_length = float('inf')  # initialise with infinity
@@ -408,18 +408,18 @@ def Genetic_Algorithm(pop_size, max_it, dist_matrix):
         
         for i in range(pop_size):
             # generate parents, dependant on fitness
-            X = Roulette_Wheel_Selection(P, dist_matrix)
-            Y = Roulette_Wheel_Selection(P, dist_matrix)
+            X = roulette_wheel_selection(P, dist_matrix)
+            Y = roulette_wheel_selection(P, dist_matrix)
 
             # generate child
-            Z = Reproduce(X, Y)
+            Z = reproduce(X, Y)
 
             # has a 'PROB' chance to mutate Z!
             if random.random() < PROB:
-                Z = Mutate(Z, dist_matrix)
+                Z = mutate(Z, dist_matrix)
             
             # Calculate the tour length of the new tour
-            curr_tour_length = Calculate_Tour_Length(Z, dist_matrix)
+            curr_tour_length = calculate_tour_length(Z, dist_matrix)
             if curr_tour_length < tour_length:
                 tour = Z
                 tour_length = curr_tour_length
@@ -446,7 +446,7 @@ max_it = 1000
 ### END OF HYPER-PARAMETERS ###
 
 # call function
-tour, tour_length = Genetic_Algorithm(pop_size, max_it, dist_matrix)
+tour, tour_length = genetic_algorithm(pop_size, max_it, dist_matrix)
 print("Best tour:", tour)
 print("Tour length:", tour_length)
 

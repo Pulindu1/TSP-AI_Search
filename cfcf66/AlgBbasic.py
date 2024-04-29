@@ -360,15 +360,17 @@ import time
 import math
 
 def init_pheramone_lvl(num_cities, initial_pheromone):
-    # Initialize matrix with initial pheromone values
-    return [[initial_pheromone] * num_cities for i in range(num_cities)]
+    pheromone_matrix = []
+    for i in range(num_cities):
+        row = [initial_pheromone] * num_cities
+        pheromone_matrix.append(row)
 
-def Calculate_Tour_Length(tour, dist_matrix):
+    return pheromone_matrix
+
+def calculate_tour_length(tour, dist_matrix):
     total_distance = 0
-
     for i in range(1, len(tour)):
         total_distance += dist_matrix[tour[i - 1]][tour[i]]
-
     # complete the loop
     total_distance += dist_matrix[tour[-1]][tour[0]]
     return total_distance
@@ -487,7 +489,7 @@ def deposit_evap_pheromone(pheromone_matrix, all_ants_solutions, best_solution, 
                 pheromone_matrix[solution[i + 1]][solution[i]] += deposit_amount
 
     # Extra deposit for the best solution
-    best_deposit_amount = Q / Calculate_Tour_Length(best_solution, dist_matrix)
+    best_deposit_amount = Q / calculate_tour_length(best_solution, dist_matrix)
     for i in range(len(best_solution) - 1):
         pheromone_matrix[best_solution[i]][best_solution[i + 1]] += best_deposit_amount
         if i != 0:
@@ -501,7 +503,7 @@ def Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha,
     pheromone_matrix = init_pheramone_lvl(num_cities, pheramone_lvl)
     
     best_solution = init_tour(num_cities)
-    best_solution_length = Calculate_Tour_Length(best_solution, dist_matrix)
+    best_solution_length = calculate_tour_length(best_solution, dist_matrix)
 
     t = 0
 
@@ -512,7 +514,7 @@ def Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha,
         for i in range(num_ants):
             start_city = ants_starting_positions[i]  # Get the starting city for each ant
             curr_solution = build_solution(start_city, num_cities, pheromone_matrix, dist_matrix, alpha, beta)
-            curr_solution_length = Calculate_Tour_Length(curr_solution, dist_matrix)
+            curr_solution_length = calculate_tour_length(curr_solution, dist_matrix)
             all_ants_solutions.append((curr_solution, curr_solution_length))
 
             # cost = Calculate_Tour_Length(tour, dist_matrix)
