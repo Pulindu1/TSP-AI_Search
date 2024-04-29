@@ -359,7 +359,8 @@ import random as rd
 import time
 import math
 
-def init_pheramone_lvl(num_cities, initial_pheromone):
+# initialise pheramone
+def init_pheromone_lvl(num_cities, initial_pheromone):
     pheromone_matrix = []
     for i in range(num_cities):
         row = [initial_pheromone] * num_cities
@@ -380,107 +381,69 @@ def init_tour(num_cities):
     random.shuffle(tour)
     return tour
 
+# place ants on random starting city
 def place_ants(num_ants, num_cities):
-    """
-    Places each ant on a random starting vertex (city).
+    ants_start_positions = []
 
-    :param num_ants: The total number of ants to place.
-    :param num_cities: The total number of cities (vertices).
-    :return: A list where the index represents the ant and the value is the starting city.
-    """
-    # Initialize a list to store the starting position for each ant
-    ants_starting_positions = []
+    for i in range(num_ants):
+        start_city = random.randint(0, num_cities - 1)
+        ants_start_positions.append(start_city)
 
-    # Assign a random city to each ant
-    for _ in range(num_ants):
-        starting_city = random.randint(0, num_cities - 1)
-        ants_starting_positions.append(starting_city)
+    return ants_start_positions
 
-    return ants_starting_positions
-
-def calculate_transition_probabilities(current_city, unvisited_cities, pheromone_matrix, dist_matrix, alpha, beta):
-    """
-    Calculates the probabilities for transitioning to each unvisited city based on pheromone levels and heuristic desirability.
-
-    :param current_city: The current city of the ant.
-    :param unvisited_cities: The cities that have not been visited yet.
-    :param pheromone_matrix: The matrix holding pheromone values for edges.
-    :param dist_matrix: The matrix holding distances between cities.
-    :param alpha: The influence level of pheromone.
-    :param beta: The influence level of heuristic desirability (distance in this case).
-    :return: A list of probabilities corresponding to each unvisited city.
-    """
+# calc probability for moving to each city
+def calculate_transition_probabilities(curr_city, unvisited_cities, pheromone_matrix, dist_matrix, alpha, beta):
     total = 0
-    probabilities = []
+    transition_probabilities = []
     
-    # Calculate the denominator of the probabilities
     for city in unvisited_cities:
-        if dist_matrix[current_city][city] == 0:
-            continue  # Avoid division by zero if there's a self-loop
-        pheromone = pheromone_matrix[current_city][city] ** alpha
-        heuristic = (1 / dist_matrix[current_city][city]) ** beta
+        if dist_matrix[curr_city][city] == 0:
+            transition_probabilities.append(0.00001)# NOTE could be either 'None' or a small number
+            continue
+        pheromone = pheromone_matrix[curr_city][city] ** alpha
+        heuristic = (1 / dist_matrix[curr_city][city]) ** beta
         total += pheromone * heuristic
     
-    # Calculate the probabilities
+    # calc probabilities
     for city in unvisited_cities:
-        if dist_matrix[current_city][city] == 0:
-            probabilities.append(0)  # Zero probability for self-loop
+        if dist_matrix[curr_city][city] == 0:
+            transition_probabilities.append(0)  # no self looping
             continue
-        pheromone = pheromone_matrix[current_city][city] ** alpha
-        heuristic = (1 / dist_matrix[current_city][city]) ** beta
+
+        pheromone = (pheromone_matrix[curr_city][city]) ** alpha
+        heuristic = (1 / dist_matrix[curr_city][city]) ** beta
         probability = (pheromone * heuristic) / total
-        probabilities.append(probability)
+        transition_probabilities.append(probability)
     
-    return probabilities
+    return transition_probabilities
 
+# creates a solution for ant, involving chance/probability
 def build_solution(start_city, num_cities, pheromone_matrix, dist_matrix, alpha, beta):
-    """
-    Builds a solution for an ant starting from start_city by stochastically constructing a trail across the graph.
-
-    :param start_city: The starting city for this ant.
-    :param num_cities: The number of cities.
-    :param pheromone_matrix: The matrix holding pheromone values for edges.
-    :param dist_matrix: The matrix holding distances between cities.
-    :param alpha: The influence level of pheromone (default is 1).
-    :param beta: The influence level of heuristic desirability (default is 2).
-    :return: A tour represented as a list of city indices.
-    """
-    current_city = start_city
-    solution = [current_city]
-    unvisited_cities = set(range(num_cities)) - {current_city}
+    curr_city = start_city
+    unvisited_cities = set(range(num_cities)) - {curr_city}
+    solution = [curr_city]
     
-    # Loop until all cities are visited
-    while unvisited_cities:
+    while unvisited_cities: # do all cities
         probabilities = calculate_transition_probabilities(
-            current_city, unvisited_cities, pheromone_matrix, dist_matrix, alpha, beta
+            curr_city, unvisited_cities, pheromone_matrix, dist_matrix, alpha, beta
         )
         
-        # Choose the next city based on the calculated probabilities
+        # next city depend on prob
         next_city = random.choices(list(unvisited_cities), weights=probabilities)[0]
         solution.append(next_city)
-        
-        # Update the current city and unvisited cities
-        current_city = next_city
+        curr_city = next_city
         unvisited_cities.remove(next_city)
     
     return solution
 
-
+# deposit or evaporate pheromone
 def deposit_evap_pheromone(pheromone_matrix, all_ants_solutions, best_solution, rho, Q):
-    """
-    Update pheromone levels with evaporation and new deposits.
-    :param pheromone_matrix: Current pheromone levels for all paths.
-    :param all_ants_solutions: All the solutions found by ants in the current iteration.
-    :param best_solution: The best solution found so far.
-    :param rho: Evaporation rate.
-    :param Q: Amount of pheromone to deposit.
-    """
-    # Evaporate pheromone on all paths
+    # Evaporate
     for i in range(len(pheromone_matrix)):
         for j in range(len(pheromone_matrix[i])):
             pheromone_matrix[i][j] *= (1 - rho)
     
-    # Deposit new pheromone
+    # Deposit
     for solution, length in all_ants_solutions:
         deposit_amount = Q / length
         for i in range(len(solution) - 1):
@@ -488,7 +451,7 @@ def deposit_evap_pheromone(pheromone_matrix, all_ants_solutions, best_solution, 
             if i != 0:  # Ensuring the matrix is symmetric if needed
                 pheromone_matrix[solution[i + 1]][solution[i]] += deposit_amount
 
-    # Extra deposit for the best solution
+    # best solution get extra pheromone deposit
     best_deposit_amount = Q / calculate_tour_length(best_solution, dist_matrix)
     for i in range(len(best_solution) - 1):
         pheromone_matrix[best_solution[i]][best_solution[i + 1]] += best_deposit_amount
@@ -498,9 +461,9 @@ def deposit_evap_pheromone(pheromone_matrix, all_ants_solutions, best_solution, 
 
 
 
-def Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha, beta, rho, Q):
+def Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha, beta, evap_rate, total_pheromone):
     
-    pheromone_matrix = init_pheramone_lvl(num_cities, pheramone_lvl)
+    pheromone_matrix = init_pheromone_lvl(num_cities, pheramone_lvl)
     
     best_solution = init_tour(num_cities)
     best_solution_length = calculate_tour_length(best_solution, dist_matrix)
@@ -524,7 +487,7 @@ def Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha,
                 best_solution = curr_solution
                 best_solution_length = curr_solution_length
             
-            deposit_evap_pheromone(pheromone_matrix, all_ants_solutions, best_solution, rho, Q)
+            deposit_evap_pheromone(pheromone_matrix, all_ants_solutions, best_solution, evap_rate, total_pheromone)
             t += 1
 
 
@@ -551,15 +514,14 @@ pheramone_lvl = 0.5
 pheramone_decay_rate = None
 alpha = 1
 beta = 3
-rho = 0.1 # evap rate
+evap_rate = 0.1
 total_pheromone = 100
-# NOTE calculate pheramone deposit amount
 
 ### END OF HYPER-PARAMETERS ###
 
 
 # call function
-tour, tour_length = Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha, beta, rho, total_pheromone)
+tour, tour_length = Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha, beta, evap_rate, total_pheromone)
 print("Best tour", tour)
 print("tour length", tour_length)
 
