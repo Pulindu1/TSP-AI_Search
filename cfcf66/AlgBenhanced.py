@@ -553,8 +553,8 @@ def Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha,
 
 
 ### HYPER-PARAMETERS ###
-TIME_LIMIT = 300
-max_it = 1000
+TIME_LIMIT = 55
+max_it = 1000000
 num_ants = 20
 pheramone_lvl = 0.5
 pheramone_decay_rate = None

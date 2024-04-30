@@ -157,7 +157,7 @@ def read_in_algorithm_codes_and_tariffs(alg_codes_file):
 ############
 ############ END OF SECTOR 0 (IGNORE THIS COMMENT)
 
-input_file = "AISearchfile021.txt"
+input_file = "AISearchfile535.txt"
 
 ############ START OF SECTOR 1 (IGNORE THIS COMMENT)
 ############
@@ -508,7 +508,7 @@ def Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha,
 
 ### HYPER-PARAMETERS ###
 TIME_LIMIT = 55
-max_it = 1000
+max_it = 10000000
 num_ants = 20
 pheramone_lvl = 0.5
 pheramone_decay_rate = None
