@@ -1,0 +1,7 @@
+USER = cfcf66 (Pulindu Fonseka),
+ALGORITHM CODE = AC, NAME OF CITY-FILE = AISearchfile026.txt,
+SIZE = 26, TOUR LENGTH = 1761,
+0,5,3,18,17,16,25,21,15,19,8,24,14,12,7,4,20,9,11,22,10,1,6,23,13,2,
+NOTE = The parameter values are 'max_it' = 10000 and 'num_ants' = 20.
+RUN-TIME = 3.5 seconds.
+CERTIFICATE = 842.
