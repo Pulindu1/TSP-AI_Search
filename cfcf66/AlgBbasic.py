@@ -398,8 +398,8 @@ def calculate_transition_probabilities(curr_city, unvisited_cities, pheromone_ma
     
     # Calculate attractiveness for each unvisited city
     for city in unvisited_cities:
-        if dist_matrix[curr_city][city] == 0:  # Avoid division by zero or unwanted transitions
-            probabilities.append(0)  # Directly append zero, no transition possible
+        if dist_matrix[curr_city][city] == 0:  # Avoid division by zero
+            probabilities.append(0)  # no transition is possible
         else:
             pheromone = pheromone_matrix[curr_city][city] ** alpha
             heuristic = (1 / dist_matrix[curr_city][city]) ** beta
@@ -411,7 +411,7 @@ def calculate_transition_probabilities(curr_city, unvisited_cities, pheromone_ma
     if total > 0:
         probabilities = [p / total for p in probabilities]
     else:
-        # If total is zero, distribute probabilities equally among unvisited cities
+        # If total == zero, distribute probabilities equally
         probabilities = [1 / len(unvisited_cities) for _ in unvisited_cities]
 
     return probabilities
@@ -475,7 +475,7 @@ def Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha,
         all_ants_solutions = []
         
         for i in range(num_ants):
-            start_city = ants_starting_positions[i]  # Get the starting city for each ant
+            start_city = ants_starting_positions[i]
             curr_solution = build_solution(start_city, num_cities, pheromone_matrix, dist_matrix, alpha, beta)
             curr_solution_length = calculate_tour_length(curr_solution, dist_matrix)
             all_ants_solutions.append((curr_solution, curr_solution_length))

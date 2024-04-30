@@ -157,7 +157,7 @@ def read_in_algorithm_codes_and_tariffs(alg_codes_file):
 ############
 ############ END OF SECTOR 0 (IGNORE THIS COMMENT)
 
-input_file = "AISearchfile535.txt"
+input_file = "AISearchfile180.txt"
 
 ############ START OF SECTOR 1 (IGNORE THIS COMMENT)
 ############
@@ -398,8 +398,8 @@ def calculate_transition_probabilities(curr_city, unvisited_cities, pheromone_ma
     
     # Calculate attractiveness for each unvisited city
     for city in unvisited_cities:
-        if dist_matrix[curr_city][city] == 0:  # Avoid division by zero or unwanted transitions
-            probabilities.append(0)  # Directly append zero, no transition possible
+        if dist_matrix[curr_city][city] == 0:  # Avoid division by zero
+            probabilities.append(0)  # no transition is possible
         else:
             pheromone = pheromone_matrix[curr_city][city] ** alpha
             heuristic = (1 / dist_matrix[curr_city][city]) ** beta
@@ -407,11 +407,11 @@ def calculate_transition_probabilities(curr_city, unvisited_cities, pheromone_ma
             probabilities.append(attraction)
             total += attraction
 
-    # Normalize to create probabilities if total attraction is greater than zero
+    # Normalize
     if total > 0:
         probabilities = [p / total for p in probabilities]
     else:
-        # If total is zero, distribute probabilities equally among unvisited cities
+        # If total == zero, distribute probabilities equally
         probabilities = [1 / len(unvisited_cities) for _ in unvisited_cities]
 
     return probabilities
@@ -452,64 +452,54 @@ def deposit_evap_pheromone(pheromone_matrix, all_ants_solutions, best_solution, 
             if i != 0:
                 pheromone_matrix[solution[i + 1]][solution[i]] += deposit_amount
 
-    # Extra deposit for the best solution
+    # Extra deposit for best solution
     best_deposit_amount = Q / calculate_tour_length(best_solution, dist_matrix)
     for i in range(len(best_solution) - 1):
         pheromone_matrix[best_solution[i]][best_solution[i + 1]] += best_deposit_amount
         if i != 0:
             pheromone_matrix[best_solution[i + 1]][best_solution[i]] += best_deposit_amount
 
-# 
+# initialisation for greedy tour
 def init_greedy_tour(num_cities, dist_matrix, start_city=None):
     unvisited = set(range(num_cities))
     unvisited.remove(start_city)
     tour = [start_city]
-    current_city = start_city
+    curr_city = start_city
 
     while unvisited:
-        next_city = min(unvisited, key=lambda city: dist_matrix[current_city][city])
+        next_city = min(unvisited, key=lambda city: dist_matrix[curr_city][city])
         tour.append(next_city)
         unvisited.remove(next_city)
-        current_city = next_city
+        curr_city = next_city
     
     return tour
 
-def adjust_evaporation_rate(current_best, previous_best, base_rate, increment_rate):
-    if current_best < previous_best:
-        # Improve upon the best solution, decrease evaporation to encourage exploitation
-        return max(base_rate * (1 - increment_rate), 0.01)  # ensure it does not go below a minimum threshold
+# To make the evaporation rate adjustable dynamically
+def adjust_evaporation_rate(curr_best, prev_best, base_rate, increment_rate):
+    if curr_best < prev_best:
+        # decrease evap, for more exploration
+        return max(base_rate * (1 - increment_rate), 0.01)  # ensure it does not go below threshold
     else:
-        # No improvement, increase evaporation to encourage exploration
-        return min(base_rate * (1 + increment_rate), 0.99)  # ensure it does not exceed a maximum threshold
+        # increase evaporation if no improvement
+        return min(base_rate * (1 + increment_rate), 0.99)
 
-# 1. 2-opt Swap Function
+# 2-opt-swap
 def two_opt_swap(tour, dist_matrix):
-    best = tour
-    improved = True
-    while improved:
-        improved = False
+    best_tour = tour
+    has_improved = True
+    while has_improved:
+        has_improved = False
         for i in range(1, len(tour) - 2):
             for j in range(i + 1, len(tour)):
-                if j - i == 1: continue  # changes nothing, skip
-                new_tour = tour[:i] + tour[i:j][::-1] + tour[j:]
-                if calculate_tour_length(new_tour, dist_matrix) < calculate_tour_length(best, dist_matrix):
-                    best = new_tour
-                    improved = True
-        tour = best
-    return best
+                if j - i == 1: continue
+                new_tour = tour[:i] + (tour[i:j][::-1]) + tour[j:]
+                if calculate_tour_length(new_tour, dist_matrix) < calculate_tour_length(best_tour, dist_matrix):
+                    best_tour = new_tour
+                    has_improved = True
+        tour = best_tour
+    return best_tour
 
-# 2. Integration within Ant's Solution Building
-
-def build_solution_with_local_search(start_city, num_cities, pheromone_matrix, dist_matrix, alpha, beta):
-    solution = build_solution(start_city, num_cities, pheromone_matrix, dist_matrix, alpha, beta)
-    solution = two_opt_swap(solution, dist_matrix)
-    return solution
-
-
-
-
-
-
+##### ant colony function #####
 def Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha, beta, min_evap_rate, total_pheromone, increment_rate):
     
     pheromone_matrix = init_pheromone_lvl(num_cities, pheramone_lvl)
@@ -528,7 +518,7 @@ def Ant_Colony_Optimisation(dist_matrix, max_it, num_ants, pheramone_lvl, alpha,
         all_ants_solutions = []
         
         for i in range(num_ants):
-            start_city = ants_starting_positions[i]  # Get the starting city for each ant
+            start_city = ants_starting_positions[i]
             curr_solution = build_solution(start_city, num_cities, pheromone_matrix, dist_matrix, alpha, beta)
             curr_solution_length = calculate_tour_length(curr_solution, dist_matrix)
             all_ants_solutions.append((curr_solution, curr_solution_length))
